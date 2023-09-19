@@ -62,4 +62,4 @@ jobs:
         tag: ${{ steps.tag.outputs.release_tag }}
         commit: main
         token: ${{ secrets.RELEASES_TOKEN }}
-        artifacts: "/workdir/XrayLite/libv2ray.aar"
+        artifacts: "/workdir/XrayLite/*.aar"
