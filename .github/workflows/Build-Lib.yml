@@ -17,13 +17,6 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-    - name: INIT Environment
-      env:
-        DEBIAN_FRONTEND: noninteractive
-      run: |
-        sudo chmod -R 777 /opt
-        df -Th
-
     - name: Setup JDK
       uses: actions/setup-java@v3
       with:
@@ -46,12 +39,11 @@ jobs:
 
     - name: Git Repository
       run: |
-        cd opt
         git clone -b main https://github.com/2dust/AndroidLibXrayLite.git XrayLite
 
     - name: Build A Dependency
       run: |
-        cd /opt/XrayLite
+        cd XrayLite
         sed -i "s/v2core.Version())/v2core.Version() + \"${{ env.XRAY_SHA }}\")/" libv2ray_main.go
         go get github.com/xtls/xray-core@${{ inputs.XRAY_VERSION }}
         gomobile init
@@ -60,7 +52,7 @@ jobs:
 
     - name: Check Files
       run: |
-        cd /opt/
+        cd XrayLite
         ls
 
     - name: Push Tag
@@ -77,4 +69,4 @@ jobs:
         tag: ${{ steps.tag.outputs.release_tag }}
         commit: main
         token: ${{ secrets.RELEASES_TOKEN }}
-        artifacts: "/opt/XrayLite/*.aar"
+        artifacts: "/XrayLite/*.aar"
