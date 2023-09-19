@@ -21,8 +21,7 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        sudo mkdir -p /workdir
-        sudo chown $USER:$GROUPS /workdir
+        sudo chmod -R 777 /opt
         df -Th
 
     - name: Setup JDK
@@ -47,13 +46,12 @@ jobs:
 
     - name: Git Repository
       run: |
-        df -hT $PWD
+        cd opt
         git clone -b main https://github.com/2dust/AndroidLibXrayLite.git XrayLite
-        ln -sf /workdir/XrayLite $GITHUB_WORKSPACE/XrayLite
 
     - name: Build A Dependency
       run: |
-        cd XrayLite
+        cd /opt/XrayLite
         sed -i "s/v2core.Version())/v2core.Version() + \"${{ env.XRAY_SHA }}\")/" libv2ray_main.go
         go get github.com/xtls/xray-core@${{ inputs.XRAY_VERSION }}
         gomobile init
@@ -62,7 +60,7 @@ jobs:
 
     - name: Check Files
       run: |
-        cd /workdir/XrayLite
+        cd /opt/
         ls
 
     - name: Push Tag
@@ -79,4 +77,4 @@ jobs:
         tag: ${{ steps.tag.outputs.release_tag }}
         commit: main
         token: ${{ secrets.RELEASES_TOKEN }}
-        artifacts: "/workdir/XrayLite/*.aar"
+        artifacts: "/opt/XrayLite/*.aar"
