@@ -39,7 +39,7 @@ jobs:
 
     - name: Build A Dependency
       run: |
-        mkdir -p /workdir
+        sudo mkdir -p /workdir
         git clone -b main https://github.com/2dust/AndroidLibXrayLite.git XrayLite
         cd XrayLite
         sed -i "s/v2core.Version())/v2core.Version() + \"${{ env.XRAY_SHA }}\")/" libv2ray_main.go
