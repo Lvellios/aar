@@ -2,6 +2,15 @@ name: Build Library
 
 on:
   workflow_dispatch:
+    inputs:
+      XRAY_VERSION:
+        description: "Select Xray-core's version: main (latest commit) or latest (release version)."
+        required: true
+        type: choice
+        default: 'latest'
+        options:
+        - main
+        - latest
 
 jobs:
   build:
@@ -43,7 +52,7 @@ jobs:
     - name: Build A Dependency
       run: |
         cd AndroidLibXrayLite
-        sed -i 's/1.8.1/1.8.4/g' go.mod
+        sed -i "s/v2core.Version())/v2core.Version() + \"${{ env.XRAY_SHA }}\")/" libv2ray_main.go
         go get github.com/xtls/xray-core@${{ inputs.XRAY_VERSION }}
         gomobile init
         go mod tidy -v
