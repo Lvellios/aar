@@ -14,7 +14,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout AndroidLibXrayLite repository
@@ -42,12 +42,6 @@ jobs:
 
     - name: Setup Android
       uses: android-actions/setup-android@v2
-
-    - name: Get xray short sha
-      if: ${{ inputs.XRAY_VERSION == 'main' }}
-      run: |
-        cd xray-core
-        echo "XRAY_SHA=@$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
     - name: Build A Dependency
       run: |
