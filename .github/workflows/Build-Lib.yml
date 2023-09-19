@@ -66,4 +66,4 @@ jobs:
         tag: ${{ steps.tag.outputs.release_tag }}
         commit: main
         token: ${{ secrets.RELEASES_TOKEN }}
-        artifacts: "/AndroidLibXrayLite/libv2ray.aar"
+        artifacts: "/2dust/AndroidLibXrayLite/libv2ray.aar"
