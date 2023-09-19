@@ -9,17 +9,10 @@ jobs:
 
     steps:
     - name: Checkout AndroidLibXrayLite repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@main
       with:
         repository: '2dust/AndroidLibXrayLite'
         path: 'AndroidLibXrayLite'
-
-    - name: Checkout Xray-core repository
-      if: ${{ inputs.XRAY_VERSION == 'main' }}
-      uses: actions/checkout@v4
-      with:
-        repository: 'xtls/xray-core'
-        path: 'xray-core'
 
     - name: Setup Java
       uses: actions/setup-java@v3
@@ -50,7 +43,7 @@ jobs:
     - name: Build A Dependency
       run: |
         cd AndroidLibXrayLite
-        sed -i "s/v2core.Version())/v2core.Version() + \"${{ env.XRAY_SHA }}\")/" libv2ray_main.go
+        sed -i 's/1.8.1/1.8.4/g' go.mod
         go get github.com/xtls/xray-core@${{ inputs.XRAY_VERSION }}
         gomobile init
         go mod tidy -v
