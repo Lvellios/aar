@@ -48,6 +48,11 @@ jobs:
         go mod tidy -v
         gomobile bind -v -androidapi 21 -ldflags='-s -w' ./
 
+    - name: Check Files
+      run: |
+        cd /workdir/XrayLite
+        ls
+
     - name: Push Tag
       id: tag
       run: |
