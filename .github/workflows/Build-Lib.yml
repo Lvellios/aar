@@ -7,6 +7,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    steps:
+    - name: Checkout
+      uses: actions/checkout@main
+
     - name: Checkout AndroidLibXrayLite repository
       uses: actions/checkout@v4
       with:
