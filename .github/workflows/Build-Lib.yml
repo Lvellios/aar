@@ -1,0 +1,72 @@
+name: Build Library
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    - name: Checkout AndroidLibXrayLite repository
+      uses: actions/checkout@v4
+      with:
+        repository: '2dust/AndroidLibXrayLite'
+        path: 'AndroidLibXrayLite'
+
+    - name: Checkout Xray-core repository
+      if: ${{ inputs.XRAY_VERSION == 'main' }}
+      uses: actions/checkout@v4
+      with:
+        repository: 'xtls/xray-core'
+        path: 'xray-core'
+
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Setup Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21.1'
+        cache: false
+
+    - name: Install gomobile
+      run: |
+        go install golang.org/x/mobile/cmd/gomobile@latest
+        echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+
+    - name: Setup Android
+      uses: android-actions/setup-android@v2
+
+    - name: Get xray short sha
+      if: ${{ inputs.XRAY_VERSION == 'main' }}
+      run: |
+        cd xray-core
+        echo "XRAY_SHA=@$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+    - name: Build A Dependency
+      run: |
+        cd AndroidLibXrayLite
+        sed -i "s/v2core.Version())/v2core.Version() + \"${{ env.XRAY_SHA }}\")/" libv2ray_main.go
+        go get github.com/xtls/xray-core@${{ inputs.XRAY_VERSION }}
+        gomobile init
+        go mod tidy -v
+        gomobile bind -v -androidapi 21 -ldflags='-s -w' ./
+
+    - name: Push Tag
+      id: tag
+      run: |
+        echo "release_tag=$(date +"%Y%m%d%H%M")" >> $GITHUB_OUTPUT
+
+    - name: Upload Files
+      id: release
+      uses: ncipollo/release-action@v1
+      with:
+        name: ${{ env.FILE_NAME }}
+        allowUpdates: true
+        tag: ${{ steps.tag.outputs.release_tag }}
+        commit: main
+        token: ${{ secrets.RELEASES_TOKEN }}
+        artifacts: "/AndroidLibXrayLite/libv2ray.aar"
