@@ -12,6 +12,12 @@ on:
         - main
         - latest
 
+env:
+  UPLOAD_COWTRANSFER: false
+  RELEASE: true
+  TZ: Canada/Atlantic
+  FILE_NAME: Android Xray Library
+
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -60,6 +66,13 @@ jobs:
       run: |
         echo "release_tag=$(date +"%Y%m%d%H%M")" >> $GITHUB_OUTPUT
 
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      if: steps.organize.outputs.status == 'success' && !cancelled()
+      with:
+        name: OpenWrt-RootFS
+        path: ${{ env.FIRMWARE }}
+
     - name: Upload Files
       id: release
       uses: ncipollo/release-action@v1
@@ -69,4 +82,4 @@ jobs:
         tag: ${{ steps.tag.outputs.release_tag }}
         commit: main
         token: ${{ secrets.RELEASES_TOKEN }}
-        artifacts: "/XrayLite/*.aar"
+        artifacts: XrayLite/libv2ray.aar
