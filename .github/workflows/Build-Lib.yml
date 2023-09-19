@@ -16,6 +16,14 @@ jobs:
   build:
     runs-on: ubuntu-22.04
 
+    - name: INIT Environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo mkdir -p /workdir
+        sudo chown $USER:$GROUPS /workdir
+        df -Th
+
     steps:
     - name: Setup JDK
       uses: actions/setup-java@v3
@@ -37,10 +45,14 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v2
 
+    - name: Git Repository
+      run: |
+        df -hT $PWD
+        git clone -b main https://github.com/2dust/AndroidLibXrayLite.git XrayLite
+        ln -sf /workdir/XrayLite $GITHUB_WORKSPACE/XrayLite
+
     - name: Build A Dependency
       run: |
-        sudo mkdir -p /workdir
-        git clone -b main https://github.com/2dust/AndroidLibXrayLite.git XrayLite
         cd XrayLite
         sed -i "s/v2core.Version())/v2core.Version() + \"${{ env.XRAY_SHA }}\")/" libv2ray_main.go
         go get github.com/xtls/xray-core@${{ inputs.XRAY_VERSION }}
