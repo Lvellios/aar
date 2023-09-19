@@ -16,6 +16,7 @@ jobs:
   build:
     runs-on: ubuntu-22.04
 
+    steps:
     - name: INIT Environment
       env:
         DEBIAN_FRONTEND: noninteractive
@@ -24,7 +25,6 @@ jobs:
         sudo chown $USER:$GROUPS /workdir
         df -Th
 
-    steps:
     - name: Setup JDK
       uses: actions/setup-java@v3
       with:
